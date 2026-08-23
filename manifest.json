@@ -17,6 +17,15 @@
   "start_url": "./index.html",
   "background_color": "#ffffff",
   "theme_color": "#3498db",
-  "display": "standalone",
-  "orientation": "portrait"
+  "display": "fullscreen",
+  "orientation": "portrait-primary",
+  "id": "123146798746512",
+  "lang": "ar",
+  "display_override": [
+    "fullscreen",
+    "window-controls-overlay",
+    "browser",
+    "minimal-ui",
+    "standalone"
+  ]
 }
