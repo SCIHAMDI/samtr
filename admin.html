@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>لوحة تحكم الأدمن - Al Ola Center</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-actions">
+    <button class="btn-pill" id="logoutBtn"><span>تسجيل الخروج</span> 🚪</button>
+  </div>
+  <div class="topbar-brand">
+    <h1>Al Ola Center - سنتر العلا</h1>
+    <p>لوحة تحكم الأدمن</p>
+  </div>
+</div>
+
+<div class="page-wrap" style="grid-template-columns:1fr;">
+  <div class="main-col" style="max-width:1100px; margin:0 auto; width:100%;">
+
+    <!-- Tabs -->
+    <div class="tabs" id="adminTabs">
+      <button class="tab-item active" data-tab="overview">🏠<span>الرئيسية</span></button>
+      <button class="tab-item" data-tab="create">➕<span>إنشاء طالب</span></button>
+      <button class="tab-item" data-tab="teachers">🧑‍🏫<span>المدرسين</span></button>
+      <button class="tab-item" data-tab="grades">📝<span>إضافة درجات</span></button>
+      <button class="tab-item" data-tab="edit">✏️<span>تعديل بروفايل</span></button>
+      <button class="tab-item" data-tab="attendance">📷<span>الحضور والانصراف</span></button>
+      <button class="tab-item" data-tab="payments">💳<span>المصروفات</span></button>
+      <button class="tab-item" data-tab="notes">💬<span>ملاحظات</span></button>
+    </div>
+
+    <!-- ============ TAB 0: الرئيسية ============ -->
+    <section class="panel tab-panel" id="tab-overview">
+      <div class="panel-title">🏠 نظرة عامة</div>
+      <div class="stat-grid cols-4" style="margin-bottom:20px;">
+        <div class="stat-card purple"><div class="icon">👥</div><div class="value" id="ov_totalStudents">0</div><div class="label">إجمالي الطلاب المسجلين</div></div>
+        <div class="stat-card teal"><div class="icon"><span class="presence-dot"></span> 📡</div><div class="value" id="ov_online">0</div><div class="label">متصلين بالموقع الآن</div></div>
+        <div class="stat-card orange"><div class="icon">👁️</div><div class="value" id="ov_pageViews">0</div><div class="label">عدد مرات فتح الموقع</div></div>
+        <div class="stat-card yellow"><div class="icon">📅</div><div class="value" id="ov_todayPresent">0</div><div class="label">حضروا النهاردة</div></div>
+      </div>
+      <div class="stat-grid" style="margin-bottom:20px;">
+        <div class="stat-card teal"><div class="icon">✅</div><div class="value" id="ov_paidCount">0</div><div class="label">دفعوا مصاريف الشهر</div></div>
+        <div class="stat-card pink"><div class="icon">❌</div><div class="value" id="ov_unpaidCount">0</div><div class="label">لسه ما دفعوش الشهر ده</div></div>
+        <div class="stat-card purple"><div class="icon">📋</div><div class="value" id="ov_requestsCount">0</div><div class="label">طلبات دفع أونلاين قيد المراجعة</div></div>
+      </div>
+      <button class="btn btn-primary" id="openAllStudentsBtn">📋 عرض كل الطلاب (الأسماء والأكواد)</button>
+    </section>
+
+    <!-- ============ TAB: إنشاء حساب طالب ============ -->
+    <section class="panel tab-panel hidden" id="tab-create">
+      <div class="panel-title">👤 إنشاء حساب طالب جديد</div>
+      <form id="createForm">
+        <div class="row-2">
+          <div class="form-group">
+            <label>اسم الطالب</label>
+            <input type="text" class="form-control" id="c_name" required placeholder="مثال: بسنت أحمد محمد">
+          </div>
+          <div class="form-group">
+            <label>الصف الدراسي</label>
+            <input type="text" class="form-control" id="c_grade" required placeholder="مثال: الصف الثاني الثانوي">
+          </div>
+        </div>
+        <div class="row-2">
+          <div class="form-group">
+            <label>رقم ولي الأمر (واتساب) 📱</label>
+            <input type="tel" class="form-control" id="c_parentPhone" required placeholder="مثال: 01012345678">
+          </div>
+          <div class="form-group">
+            <label>العنوان (اختياري)</label>
+            <input type="text" class="form-control" id="c_address" placeholder="مثال: منيا القمح">
+          </div>
+        </div>
+
+        <div class="panel-title" style="margin-top:8px;">📚 المواد والمواعيد والمصاريف</div>
+        <p style="font-size:12px; color:var(--text-mid); margin-bottom:12px;">اختر مدرس ومجموعة من القائمة (يتعبى تلقائي)، أو اكتب البيانات يدوياً.</p>
+        <div id="subjectsWrap"></div>
+        <button type="button" class="btn btn-outline" id="addSubjectBtn" style="margin-bottom:20px;">+ إضافة مادة / مجموعة</button>
+
+        <button type="submit" class="btn btn-primary btn-block" id="createBtn">إنشاء الحساب وتوليد الكود</button>
+      </form>
+
+      <div id="createResult" class="hidden" style="margin-top:22px;">
+        <div class="panel" style="background: var(--bg); text-align:center;">
+          <p style="font-size:13.5px; color:var(--text-mid); font-weight:700; margin-bottom:8px;">تم إنشاء الحساب بنجاح ✅</p>
+          <p style="font-size:26px; font-weight:800; color:var(--purple-dark);" id="resultCode"></p>
+          <p style="font-size:13px; color:var(--text-mid); margin:10px 0;">رابط بروفايل الطالب:</p>
+          <input class="form-control" id="resultLink" readonly style="text-align:center; font-size:12.5px; margin-bottom:16px;">
+          <div id="resultQr" style="display:flex; justify-content:center;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ TAB: المدرسين ============ -->
+    <section class="panel tab-panel hidden" id="tab-teachers">
+      <div class="panel-title">🧑‍🏫 إدارة المدرسين والمجموعات</div>
+      <form id="teacherForm" style="margin-bottom:22px;">
+        <div class="row-2">
+          <div class="form-group">
+            <label>اسم المدرس / المادة</label>
+            <input type="text" class="form-control" id="t_name" required placeholder="مثال: أ. أحمد - رياضيات">
+          </div>
+          <div class="form-group" style="align-self:end;">
+            <button type="submit" class="btn btn-primary btn-block">+ إضافة مدرس جديد</button>
+          </div>
+        </div>
+      </form>
+
+      <div id="teachersList"></div>
+      <p class="empty-box hidden" id="teachersEmpty">لا يوجد مدرسين مسجلين بعد</p>
+    </section>
+
+    <!-- ============ TAB: إضافة درجات (3 مربعات) ============ -->
+    <section class="panel tab-panel hidden" id="tab-grades">
+      <div class="panel-title">📝 إضافة درجات الامتحانات</div>
+
+      <div class="step-box">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <label style="font-size:13px; font-weight:700; color:var(--text-mid); display:block; margin-bottom:7px;">كود الطالب</label>
+          <div style="display:flex; gap:10px;">
+            <input type="text" class="form-control" id="g_code" placeholder="اكتب كود الطالب هنا...">
+            <button type="button" class="btn btn-primary" id="g_searchBtn" style="white-space:nowrap;">بحث</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-box" id="g_studentBox" style="display:none;">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <label style="font-size:13px; font-weight:700; color:var(--text-mid); display:block; margin-bottom:4px;">اسم الطالب (تأكيد)</label>
+          <p id="g_studentName" style="font-size:16px; font-weight:800; color:var(--purple-dark);"></p>
+        </div>
+      </div>
+
+      <form id="gradeForm" class="hidden">
+        <div class="step-box" style="align-items:flex-start;">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="row-2">
+              <div class="form-group">
+                <label>اسم الامتحان</label>
+                <input type="text" class="form-control" id="g_examName" required placeholder="مثال: امتحان الشهر - وحدة 1">
+              </div>
+              <div class="form-group">
+                <label>تاريخ الامتحان</label>
+                <input type="date" class="form-control" id="g_examDate" required>
+              </div>
+            </div>
+            <div class="row-2">
+              <div class="form-group">
+                <label>الدرجة</label>
+                <input type="number" class="form-control" id="g_score" required placeholder="مثال: 27">
+              </div>
+              <div class="form-group">
+                <label>الدرجة النهائية</label>
+                <input type="number" class="form-control" id="g_maxScore" required placeholder="مثال: 30">
+              </div>
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">حفظ الدرجة في سجل الطالب</button>
+      </form>
+
+      <div class="panel-title" style="margin-top:24px;">آخر الدرجات المُضافة لهذا الطالب</div>
+      <div class="table-wrap">
+        <table class="data-table" id="g_gradesTable">
+          <thead><tr><th>الامتحان</th><th>التاريخ</th><th>الدرجة</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="empty-box hidden" id="g_emptyGrades">لا توجد درجات مسجلة بعد</p>
+    </section>
+
+    <!-- ============ TAB: تعديل بروفايل طالب ============ -->
+    <section class="panel tab-panel hidden" id="tab-edit">
+      <div class="panel-title">✏️ تعديل بروفايل طالب</div>
+      <div style="display:flex; gap:10px; margin-bottom:20px;">
+        <input type="text" class="form-control" id="e_code" placeholder="اكتب كود الطالب للبحث...">
+        <button type="button" class="btn btn-primary" id="e_searchBtn" style="white-space:nowrap;">بحث</button>
+      </div>
+
+      <form id="editForm" class="hidden">
+        <div class="row-2">
+          <div class="form-group">
+            <label>اسم الطالب</label>
+            <input type="text" class="form-control" id="e_name" required>
+          </div>
+          <div class="form-group">
+            <label>الصف الدراسي</label>
+            <input type="text" class="form-control" id="e_grade" required>
+          </div>
+        </div>
+        <div class="row-2">
+          <div class="form-group">
+            <label>رقم ولي الأمر (واتساب) 📱</label>
+            <input type="tel" class="form-control" id="e_parentPhone" required>
+          </div>
+          <div class="form-group">
+            <label>العنوان</label>
+            <input type="text" class="form-control" id="e_address">
+          </div>
+        </div>
+
+        <div class="panel-title" style="margin-top:8px;">📚 المواد والمواعيد والمصاريف</div>
+        <div id="e_subjectsWrap"></div>
+        <button type="button" class="btn btn-outline" id="e_addSubjectBtn" style="margin-bottom:20px;">+ إضافة مادة / مجموعة</button>
+
+        <div style="display:flex; gap:12px;">
+          <button type="submit" class="btn btn-primary" style="flex:1;">حفظ التعديلات</button>
+          <button type="button" class="btn btn-danger" id="e_deleteBtn">حذف الطالب</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ============ TAB: الحضور والانصراف ============ -->
+    <section class="panel tab-panel hidden" id="tab-attendance">
+      <div class="panel-title">📷 نظام الحضور والانصراف</div>
+
+      <div class="form-group">
+        <label>إدخال / مسح الكود (يدوي - أو باركود سكانر متوصل بالكمبيوتر)</label>
+        <input type="text" class="code-scan-input" id="manualCodeInput" placeholder="اكتب الكود أو استخدم جهاز الباركود ثم Enter" autocomplete="off">
+        <p class="scan-hint">جهاز الباركود بيشتغل زي الكيبورد عادي - اضغط جوه المربع وامسح الكارت مباشرة.</p>
+      </div>
+
+      <div style="text-align:center; margin:16px 0;">
+        <button class="btn btn-outline" id="toggleScanBtn">📷 تشغيل الكاميرا (QR)</button>
+      </div>
+      <div id="qr-reader" style="max-width:420px; margin:0 auto;"></div>
+
+      <div id="scanResult" class="scan-result hidden"></div>
+
+      <div class="panel-title" style="margin-top:26px;">⏰ فاتهم معادهم النهاردة</div>
+      <div id="missedList"></div>
+      <p class="empty-box hidden" id="missedEmpty">مفيش حد فايته معاده لحد دلوقتي 👍</p>
+
+      <div class="panel-title" style="margin-top:26px;">آخر عمليات الحضور اليوم</div>
+      <div class="table-wrap">
+        <table class="data-table" id="attTable">
+          <thead><tr><th>الكود</th><th>الاسم</th><th>الحالة</th><th>الوقت</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="empty-box hidden" id="attEmpty">لا توجد عمليات مسجلة اليوم</p>
+    </section>
+
+    <!-- ============ TAB: المصروفات ============ -->
+    <section class="panel tab-panel hidden" id="tab-payments">
+      <div class="panel-title">💳 متابعة المصروفات</div>
+      <div style="display:flex; gap:10px; margin-bottom:20px;">
+        <input type="text" class="form-control" id="pay_code" placeholder="اكتب كود الطالب للبحث...">
+        <button type="button" class="btn btn-primary" id="pay_searchBtn" style="white-space:nowrap;">بحث</button>
+      </div>
+
+      <div id="pay_studentBox" class="hidden">
+        <p style="font-weight:800; font-size:15px; margin-bottom:4px;" id="pay_studentName"></p>
+        <p style="font-size:12.5px; color:var(--text-mid); margin-bottom:14px;">شهر <b id="pay_monthLabel"></b> — اضغط ✓ لتأكيد دفع المادة أو ✗ لعدم الدفع</p>
+        <div id="pay_subjectsWrap"></div>
+        <p class="empty-box hidden" id="pay_noSubjects">لا توجد مواد مسجلة لهذا الطالب</p>
+      </div>
+
+      <div class="panel-title" style="margin-top:28px;">📩 طلبات الدفع الأونلاين (قيد المراجعة)</div>
+      <div id="pay_requestsList"></div>
+      <p class="empty-box hidden" id="pay_requestsEmpty">لا توجد طلبات دفع جديدة</p>
+    </section>
+
+    <!-- ============ TAB: ملاحظات ============ -->
+    <section class="panel tab-panel hidden" id="tab-notes">
+      <div class="panel-title">💬 إرسال ملاحظة عن طالب</div>
+      <div style="display:flex; gap:10px; margin-bottom:14px;">
+        <input type="text" class="form-control" id="n_code" placeholder="اكتب كود الطالب أو امسحه...">
+        <button type="button" class="btn btn-primary" id="n_searchBtn" style="white-space:nowrap;">بحث</button>
+      </div>
+      <div id="n_studentBox" class="hidden">
+        <p style="font-weight:800; font-size:15px; margin-bottom:12px;" id="n_studentName"></p>
+        <div class="form-group">
+          <label>نص الملاحظة</label>
+          <textarea class="form-control" id="n_text" placeholder="مثال: الطالب كان مشاغب اليوم وغير مهتم بالحصة"></textarea>
+        </div>
+        <button class="btn btn-primary" id="n_sendBtn">حفظ الملاحظة وإرسالها لولي الأمر عبر واتساب</button>
+
+        <div class="panel-title" style="margin-top:24px;">آخر الملاحظات</div>
+        <div id="n_list"></div>
+        <p class="empty-box hidden" id="n_empty">لا توجد ملاحظات سابقة</p>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- Modal: كل الطلاب -->
+<div class="modal-overlay hidden" id="allStudentsModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>📋 كل الطلاب</h3>
+      <button class="modal-close" id="closeAllStudentsModal">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="text" class="form-control modal-search" id="allStudentsSearch" placeholder="ابحث بالاسم أو الكود...">
+      <div id="allStudentsList"></div>
+    </div>
+  </div>
+</div>
+
+<p class="footer-note">© SMCET 2025 - لوحة تحكم الأدمن</p>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/utils.js"></script>
+
+<!-- QR generate + QR scan libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+<script src="js/admin.js"></script>
+</body>
+</html>
