@@ -1,14 +1,15 @@
 {
   "short_name": "سنتر العلا",
   "name": "تطبيق سنتر العلا التعليمي",
+  "description": "تطبيق سنتر العلا التعليمي لمتابعة درجات وقوائم الطلاب",
   "icons": [
     {
-      "src": "images/icon-192.png",
+      "src": "https://via.placeholder.com/192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "images/icon-512.png",
+      "src": "https://via.placeholder.com/512.png",
       "type": "image/png",
       "sizes": "512x512"
     }
