@@ -7,14 +7,14 @@
       "src": "https://th.bing.com/th/id/R.3286d76159f7169b212b04577e31ba30?rik=QKh%2fU67bVFr23Q&pid=ImgRaw&r=0",
       "type": "image/png",
       "sizes": "192x192"
-    }
+    },
     {
       "src": "https://th.bing.com/th/id/R.be1cc2911a5861c11f9e7ef6d04fc71b?rik=Z1QuPTHyAlQ5iA&pid=ImgRaw&r=0",
       "type": "image/png",
       "sizes": "512x512"
     }
   ]
-}
+},
   ]
   "start_url": "./index.html",
   "background_color": "#ffffff",
