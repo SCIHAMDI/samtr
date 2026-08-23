@@ -9,23 +9,25 @@
    2) Realtime Database → أنشئ قاعدة بيانات وحط الـ Rules الموجودة في ملف
       README.md المرفق مع المشروع
    ========================================================================= */
-
+// Firebase Configuration
 const firebaseConfig = {
-  apiKey: "ضع_API_KEY_هنا",
-  authDomain: "ضع_PROJECT_ID.firebaseapp.com",
-  databaseURL: "https://ضع_PROJECT_ID-default-rtdb.firebaseio.com",
-  projectId: "ضع_PROJECT_ID_هنا",
-  storageBucket: "ضع_PROJECT_ID.appspot.com",
-  messagingSenderId: "ضع_SENDER_ID_هنا",
-  appId: "ضع_APP_ID_هنا"
+  apiKey: "AIzaSyDq-NRN8YcdXKHGyRoxklRyycWMxhtgiu4",
+  authDomain: "al-ola-center.firebaseapp.com",
+  databaseURL: "https://al-ola-center-default-rtdb.firebaseio.com",
+  projectId: "al-ola-center",
+  storageBucket: "al-ola-center.firebasestorage.app",
+  messagingSenderId: "518596470658",
+  appId: "1:518596470658:web:be6155f9d6dd6d531b519b",
+  measurementId: "G-2CVDX07KME"
 };
 
-// تهيئة Firebase (يعمل تلقائياً في كل الصفحات بعد استدعاء SDK)
-firebase.initializeApp(firebaseConfig);
+// Initialize Firebase
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 
-const auth = firebase.auth();
 const db = firebase.database();
-
+const auth = firebase.auth();
 /* Firebase Storage (لرفع صور إيصالات التحويل في الدفع الأونلاين)
    لازم تفعّل Storage من Firebase Console → Build → Storage → Get started
    لو مش عايز تستخدم Storage (حساب مجاني محدود)، الكود بيرجع تلقائياً لتخزين
