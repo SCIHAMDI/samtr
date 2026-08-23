@@ -3,6 +3,87 @@
    الوصول: student.html?id=CODE
    ========================================================== */
 
+// --- دوال مساعدة لتجنب أخطاء ReferenceError ---
+function trackPresence(type) {
+  console.log("Presence tracked:", type);
+}
+
+function trackPageView() {
+  console.log("Page view tracked");
+}
+
+function todayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function currentMonthKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function monthKeyArabic(d) {
+  const months = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
+  return months[d.getMonth()];
+}
+
+function formatDateArabic(dateStr) {
+  if (!dateStr) return "-";
+  try {
+    const d = new Date(dateStr);
+    return `${d.getDate()} ${monthKeyArabic(d)} ${d.getFullYear()}`;
+  } catch (e) {
+    return dateStr;
+  }
+}
+
+function escapeHtml(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+  });
+}
+
+function compressBase64(base64Str, maxWidth = 600, quality = 0.6) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.src = base64Str;
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      let width = img.width;
+      let height = img.height;
+
+      if (width > maxWidth) {
+        height = Math.round((height * maxWidth) / width);
+        width = maxWidth;
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL("image/jpeg", quality));
+    };
+  });
+}
+
+function showToast(msg, type = "info") {
+  alert(msg);
+}
+// --------------------------------------------------------
+
 const params = new URLSearchParams(window.location.search);
 const studentCode = params.get("id");
 
@@ -125,11 +206,46 @@ function renderAll(student, code) {
       </div>`
       )
       .join("");
-  }
+  
 
   // ---------- Grades stats ----------
-  const percentages = grades.map((g) => (g.maxScore ? (g.score / g.maxScore) * 100 : 0));
-  const avgGrade = percentages.length ? percentages.reduce((a, b) => a + b, 0) / percentages.length : 0;
+const percentages = grades.map((g) => (g.maxScore ? (g.score / g.maxScore) * 100 : 0));
+    const avgGrade = percentages.length
+        ? percentages.reduce((a, b) => a + b, 0) / percentages.length
+        : 0;
+
+    document.getElementById("avgGrade").textContent = `${avgGrade.toFixed(2)}%`;
+
+    // رسم المخطط البياني (Chart) للدرجات
+    const ctx = document.getElementById("gradesChart");
+    if (ctx) {
+        new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: grades.map((g) => g.title),
+                datasets: [
+                    {
+                        label: "نسبة الدرجة (%)",
+                        data: percentages,
+                        borderColor: "#3498db",
+                        backgroundColor: "rgba(52, 152, 219, 0.2)",
+                        fill: true,
+                        tension: 0.4
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                    },
+                },
+            },
+        });
+    }
+}
   const maxGrade = percentages.length ? Math.max(...percentages) : 0;
   const minGrade = percentages.length ? Math.min(...percentages) : 0;
 
@@ -306,16 +422,8 @@ document.getElementById("payForm").addEventListener("submit", async (e) => {
     const opt = select.selectedOptions[0];
     const monthKey = currentMonthKey();
 
-    let imageUrl = uploadedImageDataUrl; // fallback: تخزين Base64 مباشرة
-    if (storage) {
-      try {
-        const ref = storage.ref(`payment-proofs/${currentCode}_${Date.now()}.jpg`);
-        await ref.putString(uploadedImageDataUrl, "data_url");
-        imageUrl = await ref.getDownloadURL();
-      } catch (err) {
-        console.warn("فشل رفع الصورة على Storage، هيتم استخدام Base64 بدلاً منه", err);
-      }
-    }
+    // ضغط الصورة وتقليل حجمها تلقائياً قبل الرفع
+    const compressedImage = await compressBase64(uploadedImageDataUrl, 600, 0.6);
 
     await db.ref("paymentRequests").push({
       code: currentCode,
@@ -325,7 +433,7 @@ document.getElementById("payForm").addEventListener("submit", async (e) => {
       amount: document.getElementById("pf_amount").value,
       phone: document.getElementById("pf_phone").value.trim(),
       month: monthKey,
-      image: imageUrl,
+      image: compressedImage,
       status: "pending",
       createdAt: new Date().toISOString(),
     });
